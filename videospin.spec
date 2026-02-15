@@ -26,7 +26,7 @@ exe = EXE(
     a.zipfiles,
     a.datas,
     [],
-    name='VideoSpin-v10',
+    name='VideoSpin-v12',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

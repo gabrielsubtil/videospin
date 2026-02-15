@@ -216,7 +216,6 @@ window.onJobComplete = function (result) {
     if (result && result.success !== undefined) {
         log(`Processamento concluído! Sucesso: ${result.success}/${result.total}`, "success");
         ui.statusText.textContent = "Concluído";
-        alert(`Processamento Finalizado!\nSucesso: ${result.success}\nTotal: ${result.total}`);
     } else {
         log("Processamento finalizado.", "info");
     }

@@ -143,7 +143,7 @@ class VideoProcessor:
         
         for idx, item in enumerate(queue):
             if self.stop_requested:
-                self.log("[STOP] Processamento interrompido pelo usuario.", "WARNING")
+                self.log("Processo parado pelo usuário", "WARNING")
                 break
 
             input_path = item['path']

@@ -8,7 +8,7 @@ from pathlib import Path
 from core import VideoProcessor
 
 # Variáveis globais
-APP_VERSION = "v1.1"
+APP_VERSION = "v1.2"
 window = None 
 processor = VideoProcessor()
 
