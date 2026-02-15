@@ -11,12 +11,21 @@ class VideoProcessor:
         self.log_callback = None
         self.progress_callback = None
         self.use_gpu = self.check_hardware()
+        self.current_process = None # Track active process for kill
 
     def request_stop(self):
         """Sinaliza para parar o processamento."""
         if self.is_processing:
             self.stop_requested = True
-            self.log("🛑 Solicitação de parada recebida...", "WARNING")
+            self.log("[STOP] Solicitacao de parada recebida...", "WARNING")
+            
+            # Força encerramento do processo atual se existir
+            if self.current_process:
+                try:
+                    self.log("[STOP] Encerrando processo FFmpeg atual...", "WARNING")
+                    self.current_process.terminate() # Tenta SIGTERM
+                except Exception as e:
+                    self.log(f"[STOP] Erro ao matar processo: {e}", "ERROR")
 
     def check_hardware(self):
         """Verifica se há suporte a NVIDIA NVENC."""
@@ -41,7 +50,7 @@ class VideoProcessor:
 
     def log(self, message, level="INFO"):
         """Envia log para a UI e console."""
-        print(f"[{level}] {message}")
+        # print(f"[{level}] {message}") # Removed print
         if self.log_callback:
             self.log_callback({'level': level, 'message': message})
 
@@ -50,9 +59,9 @@ class VideoProcessor:
         
         # Notificar status do hardware no primeiro scan
         if self.use_gpu:
-             self.log("🚀 Aceleração de Hardware (NVENC) ATIVA.", "SUCCESS")
+             self.log("[GPU] Acelaracao de Hardware (NVENC) ATIVA.", "SUCCESS")
         else:
-             self.log("⚠️ NVENC não detectado. Usando CPU (Lento).", "WARNING")
+             self.log("[CPU] NVENC nao detectado. Usando CPU (Lento).", "WARNING")
 
         if not os.path.isdir(folder_path):
             return []
@@ -69,7 +78,7 @@ class VideoProcessor:
                         'path': str(file_path),
                         'size': f"{size_mb:.1f} MB"
                     })
-            self.log(f"Scan concluído: {len(files)} vídeos encontrados em {folder_path}")
+            self.log(f"Scan concluido: {len(files)} videos encontrados em {folder_path}")
             return files
         except Exception as e:
             self.log(f"Erro ao escanear pasta: {e}", "ERROR")
@@ -128,21 +137,25 @@ class VideoProcessor:
         self.log(f"Iniciando processamento de {total} arquivos...")
         self.log(f"Modo: {'NVENC (GPU)' if self.use_gpu else 'CPU Software'}")
         self.log(f"Destino: {output_folder}")
-        self.log(f"Opções: {options}")
+        self.log(f"Opcoes: {options}")
 
         success_count = 0
         
         for idx, item in enumerate(queue):
             if self.stop_requested:
-                self.log("🛑 Processamento interrompido pelo usuário.", "WARNING")
+                self.log("[STOP] Processamento interrompido pelo usuario.", "WARNING")
                 break
 
             input_path = item['path']
             filename = item['name']
             
+            # Atualizar UI: Iniciando este arquivo
+            if self.progress_callback:
+                 self.progress_callback({'current': idx, 'total': total, 'status': f'Iniciando {filename}...'})
+
             # Validação: Origem != Destino
             if Path(input_path).parent == Path(output_folder):
-                self.log(f"PULADO: Origem e destino são iguais para {filename}", "WARNING")
+                self.log(f"PULADO: Origem e destino sao iguais para {filename}", "WARNING")
                 if self.progress_callback:
                     self.progress_callback({'current': idx + 1, 'total': total, 'status': 'skipped'})
                 continue
@@ -158,7 +171,7 @@ class VideoProcessor:
             try:
                 # Executa FFmpeg
                 # start_new_session=True para não abrir janela de console no Windows se empacotado
-                process = subprocess.Popen(
+                self.current_process = subprocess.Popen(
                     cmd,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE, # FFmpeg logs to stderr
@@ -171,16 +184,21 @@ class VideoProcessor:
                 # mas para simplificar vamos esperar e pegar o erro se falhar.
                 # Para barra de progresso real do FFmpeg precisaríamos parsear o stderr.
                 # Por enqaunto, bloqueante simples por arquivo.
-                stdout, stderr = process.communicate()
+                stdout, stderr = self.current_process.communicate()
                 
-                if process.returncode == 0:
-                    self.log(f"✅ Sucesso: {filename}")
+                if self.stop_requested:
+                     self.log(f"[STOP] Arquivo {filename} abortado.", "WARNING")
+                elif self.current_process.returncode == 0:
+                    self.log(f"[OK] Sucesso: {filename}")
                     success_count += 1
                 else:
-                    self.log(f"❌ Falha em {filename}: {stderr[:200]}...", "ERROR") # Show last 200 chars
+                    self.log(f"[ERRO] Falha em {filename}: {stderr[:200]}...", "ERROR") # Show last 200 chars
 
             except Exception as e:
-                self.log(f"Erro crítico em {filename}: {e}", "ERROR")
+                self.log(f"Erro critico em {filename}: {e}", "ERROR")
+            
+            finally:
+                self.current_process = None
 
             # Atualizar progresso UI
             if self.progress_callback:

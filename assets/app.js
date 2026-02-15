@@ -45,7 +45,6 @@ const state = {
     sourcePath: null,
     destPath: null,
     files: [],
-    files: [],
     config: {
         rotation: '90_ccw',
         bitrate: '10'
@@ -153,13 +152,7 @@ async function initApp() {
             await window.pywebview.api.start_job(state.sourcePath, state.destPath, state.config);
         } catch (e) {
             log(`Erro Fatal: ${e}`, "error");
-        } finally {
-            state.isProcessing = false;
-            ui.btnStart.disabled = false;
-            ui.btnStart.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> INICIAR';
-
-            // Hide Stop Button
-            ui.btnStop.classList.add('hidden');
+            resetUiState(); // Reset only on start fail
         }
     });
 
@@ -169,28 +162,72 @@ async function initApp() {
 
         const confirmStop = confirm("Deseja realmente parar o processamento? A ação será concluída após o arquivo atual.");
         if (confirmStop) {
-            log("Solicitando parada...", "warning");
+            log("Solicitando parada... Aguarde encerrar arquivo atual.", "warning");
             try {
+                ui.btnStop.disabled = true;
+                ui.btnStop.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> PARANDO...';
                 await window.pywebview.api.stop_job();
-                ui.btnStop.disabled = true; // Avoid double click
-                ui.btnStop.innerHTML = "PARANDO...";
             } catch (e) {
                 log(`Erro ao parar: ${e}`, "error");
+                ui.btnStop.disabled = false;
+                ui.btnStop.innerHTML = "PARAR CONVERSÃO";
             }
         }
     });
 
+    // ... (rest of listeners) ...
     // 6. Get Version
     try {
-        const ver = await window.pywebview.api.get_version();
-        const footerLink = document.getElementById('app-version-link');
-        if (footerLink) footerLink.textContent = `VideoSpin ${ver}`;
-        document.title = `VideoSpin ${ver}`; // Sync HTML title too
-        log(`Sistema Pronto (${ver}) - Aceleração Ativa`, "success");
+        if (window.pywebview.api.get_version) {
+            const ver = await window.pywebview.api.get_version();
+            const footerLink = document.getElementById('app-version-link');
+            if (footerLink) footerLink.textContent = `VideoSpin ${ver}`;
+            document.title = `VideoSpin ${ver}`;
+            log(`Sistema Pronto (${ver}) - Aceleracao Ativa`, "success");
+        }
     } catch (e) {
         console.error("Failed to get version", e);
     }
 }
+
+function resetUiState() {
+    state.isProcessing = false;
+    ui.btnStart.disabled = false;
+    ui.btnStart.innerHTML = '<span class="material-symbols-outlined">play_arrow</span> INICIAR';
+
+    // Hide Stop Button
+    ui.btnStop.classList.add('hidden');
+    ui.btnStop.disabled = false;
+    ui.btnStop.innerHTML = '<span class="material-symbols-outlined">stop_circle</span> PARAR CONVERSÃO';
+
+    // Reset Progress
+    ui.statusDot.classList.add('bg-primary');
+    ui.statusDot.classList.remove('bg-green-500');
+}
+
+// Helpers
+// ... (updateFileList existing) ...
+
+// ... (log existing) ...
+
+// Python Callbacks
+window.onJobComplete = function (result) {
+    resetUiState();
+    if (result && result.success !== undefined) {
+        log(`Processamento concluído! Sucesso: ${result.success}/${result.total}`, "success");
+        ui.statusText.textContent = "Concluído";
+        alert(`Processamento Finalizado!\nSucesso: ${result.success}\nTotal: ${result.total}`);
+    } else {
+        log("Processamento finalizado.", "info");
+    }
+}
+
+window.pythonError = function (msg) {
+    log(msg, "error");
+    resetUiState();
+}
+
+
 
 // Helpers
 function updateFileList(files) {

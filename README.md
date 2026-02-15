@@ -1,4 +1,4 @@
-# VideoSpin 🎥🔄
+# VideoSpin
 
 > **Processador de Vídeo Profissional com Aceleração de GPU e Detecção Automática de Hardware.**
 
@@ -9,7 +9,7 @@
 
 ---
 
-## 📖 Sobre o Projeto: Para Videomakers e Criadores de Conteúdo
+## Sobre o Projeto: Para Videomakers e Criadores de Conteúdo
 
 *"Prezados amigos donos de câmeras da Canon ou outras câmeras que, mesmo filmando na posição vertical, infelizmente entregam os arquivos de vídeo ainda na posição horizontal..."*
 
@@ -30,19 +30,19 @@ Para garantir a qualidade sem arquivos gigantes, defini arbitrariamente os melho
 
 ---
 
-## 🚀 Funcionalidades Principais
+## Funcionalidades Principais
 
 * **Rotação Física**: Converte vídeos deitados (Landscape) para verticais reais (Portrait) - 90° Horário ou Anti-horário.
 * **Motor Híbrido Inteligente**:
-  * 🚀 **NVIDIA NVENC**: Se detectar uma GPU NVIDIA, usa aceleração de hardware para conversão ultra-rápida.
-  * ⚠️ **CPU Fallback**: Se não houver GPU compatível, alterna automaticamente para processamento via CPU, garantindo que o app funcione em qualquer PC.
+  * **NVIDIA NVENC**: Se detectar uma GPU NVIDIA, usa aceleração de hardware para conversão ultra-rápida.
+  * **CPU Fallback**: Se não houver GPU compatível, alterna automaticamente para processamento via CPU, garantindo que o app funcione em qualquer PC.
 * **Presets de Qualidade**: Opções de bitrate (8, 10, 12, 18 Mbps) focadas em redes sociais.
 * **Processamento em Lote**: Converta pastas inteiras ou múltiplos arquivos de uma vez.
 * **Interface Limpa**: Design moderno, Drag & Drop e Logs em tempo real.
 
 ---
 
-## 🛠️ Requisitos do Sistema
+## Requisitos do Sistema
 
 1. **Python 3.10+** instalado.
 2. **FFmpeg** instalado e adicionado ao PATH do sistema (Essencial para o processamento).
@@ -50,7 +50,7 @@ Para garantir a qualidade sem arquivos gigantes, defini arbitrariamente os melho
 
 ---
 
-## 📦 Instalação e Uso
+## Instalação e Uso
 
 O VideoSpin foi projetado para ser leve. Você não precisa instalar nada complexo além do Python e FFmpeg.
 
@@ -75,7 +75,7 @@ O VideoSpin foi projetado para ser leve. Você não precisa instalar nada comple
 
 ---
 
-## 🔧 Compilação Futura (PyInstaller)
+## Compilação Futura (PyInstaller)
 
 O projeto já está configurado para gerar um executável único (`.exe`).
 Quando desejar compilar, apenas instale o `pyinstaller` e execute:
@@ -88,7 +88,7 @@ Isso gerará o arquivo `dist/VideoSpin-v10.exe` autônomo.
 
 ---
 
-## ✨ Agradecimentos e Créditos
+## Agradecimentos e Créditos
 
 Este projeto foi desenvolvido através de uma sessão intensiva de **Vibe Code**, cuidadosamente testado e arquitetado com foco em Clean Code e Segurança.
 
@@ -96,11 +96,11 @@ Um agradecimento especial ao ecossistema **Google Antigravity**, cuja inteligên
 
 ---
 
-**VideoSpin** - Potência máxima para seus vídeos verticais. 🚀
+**VideoSpin** - Potência máxima para seus vídeos verticais.
 
 ---
 
-## 📄 Licença e Uso
+## Licença e Uso
 
 **PolyForm Shield License 1.0.0**
 
