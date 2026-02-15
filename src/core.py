@@ -169,15 +169,21 @@ class VideoProcessor:
             self.log(f"Processando: {filename}...")
             
             try:
-                # Executa FFmpeg
-                # start_new_session=True para não abrir janela de console no Windows se empacotado
-                self.current_process = subprocess.Popen(
+                # No Windows, usamos CREATE_NO_WINDOW para evitar que a janela do FFmpeg apareça
+                if os.name == 'nt':
+                    import subprocess as sp
+                    creationflags = sp.CREATE_NO_WINDOW
+                else:
+                    creationflags = 0
+
+                self.current_process = sp.Popen(
                     cmd,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE, # FFmpeg logs to stderr
+                    stdout=sp.PIPE,
+                    stderr=sp.PIPE,
                     text=True,
-                    encoding='utf-8', 
-                    errors='replace'
+                    encoding='utf-8',
+                    errors='replace',
+                    creationflags=creationflags
                 )
                 
                 # Ler stderr em tempo real para logs seria ideal, 
