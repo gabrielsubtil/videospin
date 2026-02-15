@@ -90,7 +90,7 @@ Isso gerará o arquivo `dist/VideoSpin-v10.exe` autônomo.
 
 ## ✨ Agradecimentos e Créditos
 
-Este projeto foi desenvolvido através de uma sessão intensiva de **Live Coding**, cuidadosamente testado e arquitetado com foco em Clean Code e Segurança.
+Este projeto foi desenvolvido através de uma sessão intensiva de **Vibe Code**, cuidadosamente testado e arquitetado com foco em Clean Code e Segurança.
 
 Um agradecimento especial ao ecossistema **Google Antigravity**, cuja inteligência e capacidades avançadas de agente possibilitaram a criação desta ferramenta profissional em tempo recorde.
 

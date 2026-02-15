@@ -68,3 +68,8 @@ venv.bak/
 
 # Logs
 *.log
+
+# Internal Tools
+.agent/
+.gemini/
+.brain/
